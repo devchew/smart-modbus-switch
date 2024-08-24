@@ -66,7 +66,20 @@ export const ConnectionProvider: FunctionComponent<PropsWithChildren> = ({ child
     );
 };
 
-const readFromPort = async (reader: ReadableStreamDefaultReader<Uint8Array>, onRead: (data: Uint8Array) => void) => {
+const readFromPort = async (reader: ReadableStreamDefaultReader<Uint8Array>, onRead: (data: Uint8Array) => void, debounceTime = 10) => {
+    let buffer = new Uint8Array();
+    let timeoutId: number | null = null;
+
+    const debounce = (data: Uint8Array) => {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => {
+            onRead(data);
+            buffer = new Uint8Array();
+        }, debounceTime);
+    };
+
     try {
         while (true) {
             const { value, done } = await reader.read();
@@ -74,7 +87,10 @@ const readFromPort = async (reader: ReadableStreamDefaultReader<Uint8Array>, onR
                 reader.releaseLock();
                 break;
             }
-            onRead(value);
+            if (value) {
+                buffer = new Uint8Array([...buffer, ...value]);
+                debounce(buffer);
+            }
         }
     } catch (error) {
         console.error('Error reading from port:', error);
