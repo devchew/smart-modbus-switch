@@ -5,7 +5,6 @@ interface UseConnection {
     port: SerialPort | null;
     subscribe: (onRead: (data: Uint8Array) => void) => void;
     send: (data: Uint8Array) => void;
-    close: () => void;
     open: () => void;
     disconnect: () => void;
 }
@@ -36,7 +35,7 @@ export const ConnectionProvider: FunctionComponent<PropsWithChildren> = ({ child
         writer.releaseLock();
     };
 
-    const close = async () => {
+    const disconnect = async () => {
         if (reader) {
             await reader.cancel();
             reader.releaseLock();
@@ -54,18 +53,14 @@ export const ConnectionProvider: FunctionComponent<PropsWithChildren> = ({ child
         }
     };
 
-    const disconnect = async () => {
-        await close();
-    };
-
     useEffect(() => {
         return () => {
-            close();
+            disconnect();
         };
     }, []);
 
     return (
-        <ConnectionContext.Provider value={{ chosePort, port, subscribe, send, close, open, disconnect }}>
+        <ConnectionContext.Provider value={{ chosePort, port, subscribe, send, open, disconnect }}>
             {children}
         </ConnectionContext.Provider>
     );

@@ -1,26 +1,7 @@
 import { FunctionComponent, useEffect, useState } from 'react';
+import { useConnection } from '../hoocks/ConnectionProvider.tsx';
 
 type Props = {};
-
-const readFromPort = (reader: ReadableStreamDefaultReader<Uint8Array>, onRead: (data: Uint8Array) => void) => {
-    return new Promise<void>(async (resolve, reject) => {
-        try {
-            while (true) {
-                const { value, done } = await reader.read();
-                if (done) {
-                    // Allow the serial port to be closed later.
-                    reader.releaseLock();
-                    resolve();
-                    break;
-                }
-                // value is a Uint8Array.
-                onRead(value);
-            }
-        } catch (error) {
-            reject(error);
-        }
-    });
-};
 
 const ui8ToHexStr = (ui8: Uint8Array) => {
     return Array.from(ui8).map(b => b.toString(16).padStart(2, '0')).join(' ');
@@ -31,69 +12,37 @@ const hexStrToUi8 = (hexStr: string) => {
 }
 
 export const Terminal: FunctionComponent<Props> = () => {
-  const [port, setPort] = useState<SerialPort | null>(null);
-  const [output, setOutput] = useState("");
-  const appendOutput = (data: string) => setOutput(cur => cur + '\n' +  data);
+    const {port, chosePort, send, subscribe, disconnect} = useConnection();
 
-  useEffect(() => {
+    const [output, setOutput] = useState("");
 
-  }, []);
-
-  useEffect(() => {
-        if (!port) {
-            return;
+    useEffect(() => {
+        if (port) {
+            subscribe((data) => {
+                setOutput(prev => prev + ui8ToHexStr(data) + '\n');
+            });
         }
-        if (!port.readable) {
-            return;
-        }
-      const reader = port.readable.getReader();
+    }, [port]);
 
-      readFromPort(reader, (data) => {
-          appendOutput(ui8ToHexStr(data));
-      });
+    useEffect(() => disconnect, []);
 
-  }, [port]);
+    const write = async () => {
+        if (!port) return;
+        send(hexStrToUi8('01 01 00 00 00 08 3D CC'));
+    }
 
+    return (
+        <div>
 
-  const chosenPort = () => {
-      navigator.serial.requestPort()
-          .then(port => {
-              port.open({ baudRate: 9600 })
-                  .then(() => {
-                      setPort(port)
-                  });
-          })
-  }
-
-  const write = () => {
-        if (!port) {
-            return;
-        }
-        if (!port.writable) {
-            return;
-        }
-      const writer = port.writable.getWriter();
-
-    const data = hexStrToUi8("01 03 00 00 00 01 84 0A");
-      writer.write(data).then(() => {
-            appendOutput("Data sent");
-          writer.releaseLock();
-      })
+            <button onClick={chosePort}>Choose port</button>
+            {port && <>
+              <pre>{JSON.stringify(port.getInfo(), null, 2)}</pre>
+            <button onClick={disconnect}>Disconnect</button>
+            <button onClick={write}>Write</button>
+            <pre>{output}</pre>
+            </>}
 
 
-// Allow the serial port to be closed later.
-
-  }
-
-  return (
-    <div>
-
-      <button onClick={chosenPort}>Choose port</button>
-      {port && <pre>{JSON.stringify(port.getInfo(), null, 2)}</pre>}
-        <button onClick={write}>Write</button>
-
-        <pre>{output}</pre>
-
-    </div>
-  );
+        </div>
+    );
 };
