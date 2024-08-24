@@ -1,6 +1,6 @@
 import { createContext, FunctionComponent, PropsWithChildren, useContext, useEffect, useState } from 'react';
 
-interface UseConnection {
+export interface Connection {
     chosePort: () => void;
     port: SerialPort | null;
     subscribe: (onRead: (data: Uint8Array) => void) => void;
@@ -9,7 +9,7 @@ interface UseConnection {
     disconnect: () => void;
 }
 
-const ConnectionContext = createContext<UseConnection | undefined>(undefined);
+const ConnectionContext = createContext<Connection | undefined>(undefined);
 
 export const ConnectionProvider: FunctionComponent<PropsWithChildren> = ({ children }) => {
     const [port, setPort] = useState<SerialPort | null>(null);
