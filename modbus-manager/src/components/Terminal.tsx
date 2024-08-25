@@ -1,18 +1,11 @@
 import { FunctionComponent, useEffect, useState } from 'react';
 import { useConnection } from '../hoocks/ConnectionProvider.tsx';
 import { useR4IO } from '../hoocks/useR4IO.ts';
-import { addCRC, ModbusOutputLine } from '../helpers/modbus.ts';
-import { useModbus } from '../hoocks/useModbus.ts';
+import { ModbusOutputLine } from '../helpers/modbus.ts';
+
+import { ui8ToHexStr } from '../helpers/dataTransformers.ts';
 
 type Props = {};
-
-const ui8ToHexStr = (ui8: Uint8Array) => {
-    return Array.from(ui8).map(b => b.toString(16).padStart(2, '0')).join(' ');
-}
-
-const hexStrToUi8 = (hexStr: string) => {
-    return new Uint8Array(hexStr.split(' ').map(b => parseInt(b, 16)));
-}
 
 const OutputLog: FunctionComponent<{ output: ModbusOutputLine[] }> = ({ output }) => {
     return (

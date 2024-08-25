@@ -1,6 +1,6 @@
 import { Connection } from './ConnectionProvider.tsx';
 import { useState } from 'react';
-import { ui8ToNumber } from '../helpers/ui8.ts';
+import { bitNumberToHex, intToHex, ui8ToNumber } from '../helpers/dataTransformers.ts';
 import { ModbusOutputLine, ModbusResponse } from '../helpers/modbus.ts';
 import { useModbus } from './useModbus.ts';
 
@@ -12,17 +12,11 @@ export const Codes = {
     readSlaveAddress: 0x03,
 } as const;
 
-const bitNumberToHex = (bitNumber: number) => {
-    const byte = '00000000'.split('')
-    byte[bitNumber] = '1';
-    return parseInt(byte.reverse().join(''), 2).toString(16).padStart(2, '0');
-};
 
-const intToHex = (value: number) => value.toString(16).padStart(2, '0');
 
 export const useR4IO = (connection: Connection) => {
     const [address, setAddress] = useState<string>('FF');
-    const [inputsState, setInputsState] = useState([false, false, false, false]);
+    // const [inputsState, setInputsState] = useState([false, false, false, false]);
 
     const responseParser = (response: ModbusResponse, direction: ModbusOutputLine["direction"]): string => {
         if (response.address === 0xFF && response.func === Codes.readSlaveAddress && direction === 'in') {
@@ -38,7 +32,7 @@ export const useR4IO = (connection: Connection) => {
         return '';
     }
 
-    const { sendHexStr, output } = useModbus(connection, responseParser);
+    const { sendHexStr, output, clearOutput } = useModbus(connection, responseParser);
 
     const writeSingleOutput = (output: number, value: boolean) => {
         const outputHex = output.toString(16).padStart(2, '0');
@@ -70,6 +64,7 @@ export const useR4IO = (connection: Connection) => {
     return {
         address,
         output,
+        clearOutput,
         readSlaveAddress,
         readInput,
         writeSingleOutput,

@@ -1,15 +1,15 @@
 import "xp.css/dist/XP.css";
-import { Terminal } from "./components/Terminal"
 import { ConnectionProvider } from './hoocks/ConnectionProvider.tsx';
+import { DeviceManagerWindow } from './components/DeviceManagerWindow.tsx';
 
 
 function App() {
 
   return (
     <>
-      <h1>Modbus manager</h1>
+      <h2>Modbus manager</h2>
         <ConnectionProvider>
-            <Terminal />
+            <DeviceManagerWindow/>
         </ConnectionProvider>
     </>
   )

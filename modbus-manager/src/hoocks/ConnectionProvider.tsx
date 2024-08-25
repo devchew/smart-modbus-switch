@@ -14,6 +14,8 @@ const ConnectionContext = createContext<Connection | undefined>(undefined);
 export const ConnectionProvider: FunctionComponent<PropsWithChildren> = ({ children }) => {
     const [port, setPort] = useState<SerialPort | null>(null);
     const [reader, setReader] = useState<ReadableStreamDefaultReader<Uint8Array> | null>(null);
+    const [subscribers, setSubscribers] = useState<((data: Uint8Array) => void)[]>([])
+    const [lastPacket, setLastPacket] = useState<Uint8Array>(new Uint8Array());
 
     const chosePort = async () => {
         const selectedPort = await navigator.serial.requestPort();
@@ -22,10 +24,7 @@ export const ConnectionProvider: FunctionComponent<PropsWithChildren> = ({ child
     };
 
     const subscribe = (onRead: (data: Uint8Array) => void) => {
-        if (!port || !port.readable) return;
-        const reader = port.readable.getReader();
-        setReader(reader);
-        readFromPort(reader, onRead);
+        setSubscribers([...subscribers, onRead]);
     };
 
     const send = async (data: Uint8Array) => {
@@ -58,6 +57,21 @@ export const ConnectionProvider: FunctionComponent<PropsWithChildren> = ({ child
             disconnect();
         };
     }, []);
+
+    useEffect(() => {
+        if (reader) {
+            return;
+        }
+        if (port && port.readable) {
+            const reader = port.readable.getReader();
+            setReader(reader);
+            readFromPort(reader, setLastPacket);
+        }
+    }, [port]);
+
+    useEffect(() => {
+        subscribers.forEach(subscriber => subscriber(lastPacket));
+    }, [lastPacket]);
 
     return (
         <ConnectionContext.Provider value={{ chosePort, port, subscribe, send, open, disconnect }}>
