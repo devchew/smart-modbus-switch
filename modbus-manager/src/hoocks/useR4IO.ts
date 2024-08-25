@@ -58,7 +58,7 @@ export const useR4IO = (connection: Connection) => {
     }
 
     const setAutoReportInputs = (interval: number) => {
-        sendHexStr(`${address} 01 06 00 F8 00 ${intToHex(interval)}`);
+        sendHexStr(`${address} 06 00 F8 00 ${intToHex(interval)}`);
     }
 
     return {
