@@ -1,6 +1,6 @@
 import { Connection } from './ConnectionProvider.tsx';
 import { useState } from 'react';
-import { bitNumberToHex, intToHex, ui8ToNumber } from '../helpers/dataTransformers.ts';
+import { intToHex, ui8ToNumber } from '../helpers/dataTransformers.ts';
 import { ModbusOutputLine, ModbusResponse } from '../helpers/modbus.ts';
 import { useModbus } from './useModbus.ts';
 
@@ -16,7 +16,7 @@ export const Codes = {
 
 export const useR4IO = (connection: Connection) => {
     const [address, setAddress] = useState<string>('FF');
-    // const [inputsState, setInputsState] = useState([false, false, false, false]);
+    const [inputsState, setInputsState] = useState([false, false, false, false]);
 
     const responseParser = (response: ModbusResponse, direction: ModbusOutputLine["direction"]): string => {
         if (response.address === 0xFF && response.func === Codes.readSlaveAddress && direction === 'in') {
@@ -27,7 +27,15 @@ export const useR4IO = (connection: Connection) => {
         // read multiple inputs
         if (response.func === 3 && direction === 'in') {
             const input = response.payload[1];
-            return `Read inputs ${input.toString(2)}`;
+            const binary = input.toString(2).padStart(4, '0');
+            setInputsState(binary.split('').reverse().map(bit => bit === '1'));
+            return `Read inputs ${binary}`;
+        }
+        if (response.func === 2 && direction === 'in') {
+            const input = response.payload[0];
+            const binary = input.toString(2).padStart(4, '0');
+            setInputsState(binary.split('').reverse().map(bit => bit === '1'));
+            return `Read inputs ${binary}`;
         }
         return '';
     }
@@ -48,9 +56,8 @@ export const useR4IO = (connection: Connection) => {
         sendHexStr(`${address} ${intToHex(Codes.writeMultipleOutputs)} 00 00 00 08 01 ${stateHex}`);
     }
 
-    const readInput = (input: number) => {
-        const inputHex = bitNumberToHex(input);
-        sendHexStr(`${address} ${intToHex(Codes.readDigitalInput)} 00 ${inputHex}`);
+    const readInputs = () => {
+        sendHexStr(`${address} ${intToHex(Codes.readDigitalInput)} 00 00 00 04`);
     }
 
     const readSlaveAddress = () => {
@@ -61,15 +68,21 @@ export const useR4IO = (connection: Connection) => {
         sendHexStr(`${address} 06 00 F8 00 ${intToHex(interval)}`);
     }
 
+    const setSlaveAddress = (newAddress: string) => {
+        console.log(`Setting new address: ${newAddress}`);
+    }
+
     return {
         address,
         output,
+        inputsState,
         clearOutput,
         readSlaveAddress,
-        readInput,
+        readInputs,
         writeSingleOutput,
         writeMultipleOutputs,
         sendHexStr,
-        setAutoReportInputs
+        setAutoReportInputs,
+        setSlaveAddress
     };
 }

@@ -14,7 +14,8 @@ export const useModbus = (
         direction,
         raw: data,
         parsed: parseRawToModbusData(data),
-        verbose: codesVerbose(parseRawToModbusData(data), direction)
+        verbose: codesVerbose(parseRawToModbusData(data), direction),
+        timestamp: + new Date()
     }]);
 
     const send = (data: Uint8Array) => {

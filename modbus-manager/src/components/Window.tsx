@@ -1,8 +1,8 @@
 import { FunctionComponent, PropsWithChildren } from 'react';
 
-export const Window: FunctionComponent<PropsWithChildren<{title: string}>> = ({children, title}) =>
+export const Window: FunctionComponent<PropsWithChildren<{ title: string }>> = ({children, title}) =>
     (
-        <div className="window">
+        <div className="window" style={{minWidth:800}}>
             <div className="title-bar">
                 <div className="title-bar-text">{title}</div>
                 <div className="title-bar-controls">

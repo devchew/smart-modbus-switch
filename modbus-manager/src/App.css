@@ -1,0 +1,16 @@
+html, body, #root {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    background-image: url("http://localhost:5173/src/assets/bils.jpg");
+    background-size: cover;
+}
+
+.mainFrame {
+    display: flex;
+    justify-content: center;
+    min-height: 100%;
+    align-items: center;
+}

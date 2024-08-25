@@ -5,6 +5,7 @@ import { FieldSection } from './FieldSection.tsx';
 export const DeviceConfig: FunctionComponent<TabsProps> = ({device, connection}) => {
     const [InputField, setInputField] = useState("");
     const [autoUpdateInterval, setAutoUpdateInterval] = useState(0)
+    const [newAddress, setNewAddress] = useState('01')
 
     const write = async () => {
         if (!connection.port) return;
@@ -18,7 +19,11 @@ export const DeviceConfig: FunctionComponent<TabsProps> = ({device, connection})
                        style={{backgroundColor: '#dfdfdf', borderColor: '#a8a8a8'}}/>
                 <button onClick={device.readSlaveAddress}>Read</button>
             </FieldSection>
-            <FieldSection label="Write hex value">
+            <FieldSection label="Set address">
+                <input type="text" id="newAddress" value={newAddress} onChange={(e) => setNewAddress(e.target.value)}/>
+                <button onClick={() => device.setSlaveAddress(newAddress)}>Set</button>
+            </FieldSection>
+            <FieldSection label="Send hex value">
                 <input value={InputField} onChange={(e) => setInputField(e.target.value)} type="text"
                        id="customCommand"/>
                 <button onClick={write}>Write</button>

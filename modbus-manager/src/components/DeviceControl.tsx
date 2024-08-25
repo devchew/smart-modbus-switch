@@ -1,34 +1,37 @@
 import { FunctionComponent } from 'react';
 import { TabsProps } from './DeviceManagerWindow.tsx';
+import Image from "./../assets/R4IO.jpg"
+import { FieldSection } from './FieldSection.tsx';
 
 export const DeviceControl: FunctionComponent<TabsProps> = ({device}) => {
-    const {writeSingleOutput, writeMultipleOutputs, readInput} = device;
+    const {writeSingleOutput, writeMultipleOutputs, readInputs, inputsState} = device;
     return (
-        <div>
-            <button onClick={() => writeSingleOutput(4, true)}>Write output 4 true</button>
-            <button onClick={() => writeSingleOutput(4, false)}>Write output 4 false</button>
-            <br/>
-            <button onClick={() => writeSingleOutput(5, true)}>Write output 5 true</button>
-            <button onClick={() => writeSingleOutput(5, false)}>Write output 5 false</button>
-            <br/>
-            <button onClick={() => writeSingleOutput(6, true)}>Write output 6 true</button>
-            <button onClick={() => writeSingleOutput(6, false)}>Write output 6 false</button>
-            <br/>
-            <button onClick={() => writeSingleOutput(7, true)}>Write output 7 true</button>
-            <button onClick={() => writeSingleOutput(7, false)}>Write output 7 false</button>
-            <br/>
-            <button onClick={() => writeMultipleOutputs([4, 6], true)}>Write outputs 4, 6 true</button>
-            <button onClick={() => writeMultipleOutputs([5, 7], true)}>Write outputs 5, 7 true</button>
-            <button onClick={() => writeMultipleOutputs([4, 6], false)}>Write outputs 4, 6 false</button>
-            <button onClick={() => writeMultipleOutputs([5, 7], false)}>Write outputs 5, 7 false</button>
-            <button onClick={() => writeMultipleOutputs([4, 5, 6, 7], true)}>Write all outputs true</button>
-            <button onClick={() => writeMultipleOutputs([4, 5, 6, 7], false)}>Write all outputs false</button>
-            <hr/>
-            <button onClick={() => readInput(0)}>Read input 0</button>
-            <button onClick={() => readInput(1)}>Read input 1</button>
-            <button onClick={() => readInput(2)}>Read input 2</button>
-            <button onClick={() => readInput(3)}>Read input 3</button>
-            <button onClick={() => readInput(4)}>Read input 4</button>
+        <div style={{display: 'flex', flexDirection: 'row', gap: 16}}>
+            <img src={Image} alt="R4IO" height={300}/>
+            <div style={{marginTop: 100}}>
+                {inputsState.map((state, index) => (
+                    <div className="field-row" key={`input-${index}`}>
+                        <input checked={state} disabled type="checkbox" id={`input-${index}`}/>
+                        <label htmlFor={`input-${index}`}>DI{index}</label>
+                    </div>
+                ))}
+                {new Array(4).fill(0).map((_, index) => (
+                    <div className="field-row" key={`output-${index+4}`}>
+                        <input type="checkbox" key={index+4} id={`output-${index+4}`} onChange={(e) => writeSingleOutput(index+4, e.target.checked)}/>
+                        <label htmlFor={`output-${index+4}`}>DO{index+4}</label>
+                    </div>
+                ))}
+            </div>
+            <div>
+                <FieldSection label="Outputs">
+                    <button onClick={() => writeMultipleOutputs([4, 5, 6, 7], true)}>Write all <b>true</b></button>
+                    <button onClick={() => writeMultipleOutputs([4, 5, 6, 7], false)}>Write all <b>false</b></button>
+                </FieldSection>
+                <FieldSection label="Inputs">
+                    <button onClick={() => readInputs()}>Read inputs</button>
+                </FieldSection>
+            </div>
+
         </div>
     )
 

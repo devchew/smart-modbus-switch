@@ -24,6 +24,7 @@ export const OutputLog: FunctionComponent<{ output: ModbusOutputLine[], clear: (
                         <th>Raw</th>
                         <th>Parsed</th>
                         <th>Verbose</th>
+                        <th>Time</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -34,6 +35,7 @@ export const OutputLog: FunctionComponent<{ output: ModbusOutputLine[], clear: (
                             <td>address: {line.parsed.address}, func: {line.parsed.func}, length: {line.parsed.length},
                                 payload: {ui8ToHexStr(line.parsed.payload)}</td>
                             <td>{line.verbose}</td>
+                            <td>{new Date(line.timestamp).toLocaleTimeString()}</td>
                         </tr>
                     ))}
                     </tbody>
@@ -46,7 +48,7 @@ export const OutputLog: FunctionComponent<{ output: ModbusOutputLine[], clear: (
                     <label htmlFor="autoscroll">autoscroll</label>
                 </section>
                 <section>
-                    <a onClick={clear} href="javascript:void" >clear</a>
+                    <a onClick={(e) => {e.preventDefault(); clear()}} href="#">clear</a>
                 </section>
             </div>
         </>

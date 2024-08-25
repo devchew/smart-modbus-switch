@@ -11,6 +11,7 @@ export type ModbusOutputLine = {
     raw: Uint8Array
     parsed: ModbusResponse
     verbose: string
+    timestamp: number
 }
 export const parseRawToModbusData = (data: Uint8Array): ModbusResponse => {
     const address = data[0];
