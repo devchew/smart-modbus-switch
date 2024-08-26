@@ -4,7 +4,7 @@ html, body, #root {
 }
 
 body {
-    background-image: url("http://localhost:5173/src/assets/bils.jpg");
+    background-image: url("./assets/bils.jpg");
     background-size: cover;
 }
 
