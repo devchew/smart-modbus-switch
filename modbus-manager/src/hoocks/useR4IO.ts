@@ -10,6 +10,7 @@ export const Codes = {
     writeMultipleOutputs: 0x0F,
     readDigitalInput: 0x02,
     readSlaveAddress: 0x03,
+    writeSlaveAddress: 0x06,
 } as const;
 
 
@@ -69,7 +70,7 @@ export const useR4IO = (connection: Connection) => {
     }
 
     const setSlaveAddress = (newAddress: string) => {
-        console.log(`Setting new address: ${newAddress}`);
+        sendHexStr(`FF ${intToHex(Codes.writeSlaveAddress)} 00 FD 00 ${intToHex(newAddress)}`);
     }
 
     return {
