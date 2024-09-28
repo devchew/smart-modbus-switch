@@ -5,7 +5,7 @@ import { FieldSection } from './FieldSection.tsx';
 export const DeviceConfig: FunctionComponent<TabsProps> = ({device, connection}) => {
     const [InputField, setInputField] = useState("");
     const [autoUpdateInterval, setAutoUpdateInterval] = useState(0)
-    const [newAddress, setNewAddress] = useState('01')
+    const [newAddress, setNewAddress] = useState(1)
 
     const write = async () => {
         if (!connection.port) return;
@@ -20,7 +20,7 @@ export const DeviceConfig: FunctionComponent<TabsProps> = ({device, connection})
                 <button onClick={device.readSlaveAddress}>Read</button>
             </FieldSection>
             <FieldSection label="Set address">
-                <input type="text" id="newAddress" value={newAddress} onChange={(e) => setNewAddress(e.target.value)}/>
+                <input type="text" id="newAddress" value={newAddress} onChange={(e) => setNewAddress(parseInt(e.target.value, 10))}/>
                 <button onClick={() => device.setSlaveAddress(newAddress)}>Set</button>
             </FieldSection>
             <FieldSection label="Send hex value">
@@ -29,7 +29,7 @@ export const DeviceConfig: FunctionComponent<TabsProps> = ({device, connection})
                 <button onClick={write}>Write</button>
             </FieldSection>
             <FieldSection label="Auto update interval (s)">
-                <input type="text" value={autoUpdateInterval} onChange={(e) => setAutoUpdateInterval(parseInt(e.target.value))}/>
+                <input type="text" value={autoUpdateInterval} onChange={(e) => setAutoUpdateInterval(parseInt(e.target.value, 10))}/>
                 <button onClick={() => device.setAutoReportInputs(autoUpdateInterval)}>Set</button>
             </FieldSection>
         </div>

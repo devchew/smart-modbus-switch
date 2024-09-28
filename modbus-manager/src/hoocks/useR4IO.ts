@@ -69,7 +69,7 @@ export const useR4IO = (connection: Connection) => {
         sendHexStr(`${address} 06 00 F8 00 ${intToHex(interval)}`);
     }
 
-    const setSlaveAddress = (newAddress: string) => {
+    const setSlaveAddress = (newAddress: number) => {
         sendHexStr(`FF ${intToHex(Codes.writeSlaveAddress)} 00 FD 00 ${intToHex(newAddress)}`);
     }
 
