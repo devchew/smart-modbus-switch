@@ -7,6 +7,7 @@ import { OutputLog } from './OutputLog.tsx';
 import { DeviceControl } from './DeviceControl.tsx';
 import { DeviceConfig } from './DeviceConfig.tsx';
 import { SystemInfo } from './SystemInfo.tsx';
+import HomeAssistant from './HomeAssistant.tsx';
 
 
 export interface TabsProps {
@@ -45,6 +46,11 @@ export const DeviceManagerWindow: FunctionComponent = () => {
                     title: 'System Info',
                     id: 'sysinfo',
                     component: (<SystemInfo connection={connection} device={device} />)
+                },
+                {
+                    title: 'Home Assistant',
+                    id: 'ha',
+                    component: (<HomeAssistant connection={connection} device={device} />)
                 }
             ]} />
             <OutputLog output={device.output} clear={device.clearOutput}/>
